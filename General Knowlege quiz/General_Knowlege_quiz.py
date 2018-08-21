@@ -1,92 +1,99 @@
 import tkinter as tk                # python 3
 from tkinter import font  as tkfont # python 3
+import os
+from random import random
 
-Questions = []
-Answers = []
+#iniseised the program
+main = tk.Tk()
+main.geometry("500x300")
+main.title("the title goes here")
 
+#Set the frams that will be used
+welcome = tk.Frame(main)
+start = tk.Frame(main)
+stats = tk.Frame(main)
+game = tk.Frame(main)
+answer = tk.Frame(main)
 
-"""
-File saving
-name="filename"
-text_file = open(name,"a") #a=append w=wright r=read r+ = read and wright
+for frame in (welcome, start, stats, game, answer):
+    frame.grid(row=1, column=1, sticky="nesw")
 
+def display(frame):
+    frame.tkraise()
 
-"""
+#Inisiate variables
+Questions = ["What’s the medical term for low blood sugar?", "What’s the common term for a cerebrovascular accident?", "What star other than the sun is closest to the earth?", "What is the most widely eaten fish in the world?"]
+Answers = ["Hypoglycemia", "Stroke", "Proxima Centauri", "The Herring"]
+AnsweredQuestions = []
+UserName = ""
+NumOfQuestions = len(Questions)
+userName = tk.StringVar()
+Question = int()
 
-class Main(tk.Tk):
+#checks to see if the usere has been back
+#and opens the save file
+def namecheck():
+    UserName = userName.get()
+    FileName= UserName + ".txt"
+    if os.path.exists(FileName):
+        SaveFile = open(FileName,  "r+")
+        AnsweredQuestions = SaveFile.readlines()
+        WelcomeBack.configure(text="Welcome back " + UserName + ".\nYou have answered NUMBER questions.") #sets the text for the welcome back screen
+        display(stats)
+    else:
+        SaveFile = open(FileName,  "a+")
+        i=0
+        #SaveFile.close()
+        #SaveFile = open(FileName, "r+")
+        while i < NumOfQuestions:
+            SaveFile.write("0\n")
+            i += 1
+        AnsweredQuestions = SaveFile.readlines()
+        WelcomeText.configure(text="Welcome " + UserName + ".\nPush the button below to start.") #sets the text for the welcome screen
+        display(start)
 
-    def __init__(self, *args, **kwargs):
-        tk.Tk.__init__(self, *args, **kwargs)
+#gets the next question for the user
+def questionget():
+    i = int(random(0, NumOfQuestions+1))
+    FoundQuestion = False
+    while FoundQuestion == False:
+        if AnsweredQuestions(i) == 0:
+            question = i
+            FoundQuestion = True
+        else:
+            i =+ 1
+    print("questionget")
+  
+#checks the answer the user put in
+def questioncheck():
 
-        self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
+    print("questioncheck")   
 
-        # the container is where we'll stack a bunch of frames
-        # on top of each other, then the one we want visible
-        # will be raised above the others
-        container = tk.Frame(self)
-        container.pack(side="top", fill="both", expand=True)
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
-
-        self.frames = {}
-        for F in (StartPage, PageOne, PageTwo):
-            page_name = F.__name__
-            frame = F(parent=container, controller=self)
-            self.frames[page_name] = frame
-
-            # put all of the pages in the same location;
-            # the one on the top of the stacking order
-            # will be the one that is visible.
-            frame.grid(row=0, column=0, sticky="nsew")
-
-        self.show_frame("StartPage")
-
-    def show_frame(self, page_name):
-        '''Show a frame for the given page name'''
-        frame = self.frames[page_name]
-        frame.tkraise()
-
-
-class StartPage(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        self.controller = controller
-        label = tk.Label(self, text="This is the start page", font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
-
-        button1 = tk.Button(self, text="Go to Page One",
-                            command=lambda: controller.show_frame("PageOne"))
-        button2 = tk.Button(self, text="Go to Page Two",
-                            command=lambda: controller.show_frame("PageTwo"))
-        button1.pack()
-        button2.pack()
-
-
-class PageOne(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        self.controller = controller
-        label = tk.Label(self, text="This is page 1", font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
-        button = tk.Button(self, text="Go to the start page",
-                           command=lambda: controller.show_frame("StartPage"))
-        button.pack()
-
-
-class PageTwo(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        self.controller = controller
-        label = tk.Label(self, text="This is page 2", font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
-        button = tk.Button(self, text="Go to the start page",
-                           command=lambda: controller.show_frame("StartPage"))
-        button.pack()
+#program start screen
+welcomeText = tk.Label(welcome, text="Welcome to the General Knowlege quiz.\nWhat is your name?",font=("Helvetica",15)).pack(padx=60,pady=100)
+submit = tk.Button(welcome, text="Submit", command= lambda: namecheck()).pack(side="right")
+NameEntery = tk.Entry(welcome, textvariable = userName, width = 50 ).pack(pady=10)
 
 
-if __name__ == "__main__":
-    app = Main()
-    app.mainloop()
+#returning user stats screen
+WelcomeBack = tk.Label(stats,font=("Helvetica",15))
+WelcomeBack.pack()
+button = tk.Button(stats, text="Continue", command=lambda: display(welcome)).pack()
+
+
+#New user Start Screen
+WelcomeText = tk.Label(start, text="This is page 2")
+WelcomeText.pack(side="top", fill="x", pady=10)
+button = tk.Button(start, text="Start",command=lambda: display(welcome)).pack()
+
+
+#main game screen
+label = tk.Label(game, text="This is the main game screen").pack(side="top", fill="x", pady=10)
+
+
+#answer screen
+
+
+
+display(welcome)
+main.mainloop()
