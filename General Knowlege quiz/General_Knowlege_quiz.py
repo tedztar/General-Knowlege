@@ -1,3 +1,5 @@
+#all print statements are for testing and do not have any effect on the game
+
 import tkinter as tk                # python 3
 from tkinter import font  as tkfont # python 3
 import os
@@ -15,6 +17,7 @@ stats = tk.Frame(main)
 game = tk.Frame(main)
 answer = tk.Frame(main)
 
+
 for frame in (welcome, start, stats, game, answer):
     frame.grid(row=1, column=1, sticky="nesw")
 
@@ -30,15 +33,20 @@ NumOfQuestions = len(Questions)
 userName = tk.StringVar()
 Question = int()
 
+
 #checks to see if the usere has been back
 #and opens the save file
 def namecheck():
+    NumberOfAnswered = 0
     UserName = userName.get()
     FileName= UserName + ".txt"
     if os.path.exists(FileName):
         SaveFile = open(FileName,  "r+")
         AnsweredQuestions = SaveFile.readlines()
-        WelcomeBack.configure(text="Welcome back " + UserName + ".\nYou have answered NUMBER questions.") #sets the text for the welcome back screen
+        for i in AnsweredQuestions:
+            if i == "1\n":
+                NumberOfAnswered += 1
+        WelcomeBack.configure(text="Welcome back " + UserName + ".\nYou have answered "+ str(NumberOfAnswered) +" questions.") #sets the text for the welcome back screen
         display(stats)
     else:
         SaveFile = open(FileName,  "a+")
@@ -46,7 +54,8 @@ def namecheck():
         #SaveFile.close()
         #SaveFile = open(FileName, "r+")
         while i < NumOfQuestions:
-            SaveFile.write("0\n")
+            SaveFile.write("0")
+            SaveFile.write("\n")
             i += 1
         AnsweredQuestions = SaveFile.readlines()
         WelcomeText.configure(text="Welcome " + UserName + ".\nPush the button below to start.") #sets the text for the welcome screen
@@ -62,12 +71,29 @@ def questionget():
             FoundQuestion = True
         else:
             i =+ 1
+
+    QuestionText.configure(WelcomeText=Questions[Question])
+    display(game)
     print("questionget")
   
 #checks the answer the user put in
 def questioncheck():
-
-    print("questioncheck")   
+    userAnswer=UserAnswer.get()
+    userAnswer.lower()
+    correctAnswer=Answers(Question)
+    correctAnswer.lower
+    if userAnswer == correctAnswer:
+        Correct.configure(text="That is correct./nYou guessed:")
+        CorrectAnswer.congidure(text=correctAnswer)
+        AnsweredQuestions[Question]="1\n"
+        display(answer)
+        print("correct") #for testing
+    else:
+        Correct.configure(text="That is incorrect./nThe correct answer is:")
+        CorrectAnswer.configure(text=correctAnswer)
+        display(answer)
+        print("incorrect") #for testing
+    print("questioncheck")   #for testing
 
 #program start screen
 welcomeText = tk.Label(welcome, text="Welcome to the General Knowlege quiz.\nWhat is your name?",font=("Helvetica",15)).pack(padx=60,pady=100)
@@ -88,10 +114,16 @@ button = tk.Button(start, text="Start",command=lambda: display(welcome)).pack()
 
 
 #main game screen
-label = tk.Label(game, text="This is the main game screen").pack(side="top", fill="x", pady=10)
+QuestionText = tk.Label(game, text="This is the main game screen")
+QuestionText.pack(side="top", fill="x", pady=10)
+UserAnswer = tk.Entry(welcome, textvariable = userName, width = 50 ).pack(pady=10)
 
 
 #answer screen
+Correct = tk.Label(answer, text="This is the Answer screen")
+Correct.pack(side="top", fill="x", pady=10)
+CorrectAnswer = tk.Label(answer, text="This is the Answer screen")
+CorrectAnswer.pack(side="top", fill="x", pady=10)
 
 
 
